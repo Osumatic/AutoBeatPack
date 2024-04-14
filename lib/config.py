@@ -16,17 +16,22 @@ def try_user(config, profile):
         config[profile]  # pylint: disable=pointless-statement
         return profile
     except KeyError:
-        profile = input(f"{q(profile)} not found, try again:\t")
+        profile = input(f"{q(profile)} not found:\t")
         return try_user(config, profile)
 
 
-def get_config():
+def get_config(config_filename):
     """Returns config values from config.txt"""
     raw_config = configparser.ConfigParser()
-    raw_config.read("config.ini")
+    if not path.exists(config_filename):
+        raise FileNotFoundError("file not found.")
+    raw_config.read(config_filename)
+    if len(raw_config.sections()) == 0:
+        raise ValueError("file missing profiles.")
+
     profile = "DEFAULT"
-    if input("Use DEFAULT config? y/n\t").lower() != "y":
-        profile = input("Config profile name:\t")
+    if input(f"Use {q(profile)} profile? [Y/n]\t").lower() == "n":
+        profile = input("Config profile name:\t\t")
         profile = try_user(raw_config, profile)
     config_user = raw_config[profile]
 
