@@ -4,14 +4,14 @@ AutoBeatPack
 
 import asyncio
 import os
-
 from urllib import parse
 
 import aiohttp
-
 import aiohttp.client_exceptions
-from lib.pretty import pprint, q, time, size, ind
-from lib.lists import split_list, make_all_urls
+
+from lib.lists import make_all_urls, split_list
+from lib.pretty import ind, pprint, q, size, time
+from lib.config import get_config
 
 
 async def download_file(abs_filename, response, overwrite):
@@ -42,10 +42,10 @@ async def download_file(abs_filename, response, overwrite):
     pprint(f"Downloaded {q(filename)}!")
 
 
-async def download_decision(url):
+async def download_decision(url, download_folder):
     """Decide whether to download file from url based on local file contents."""
     filename = os.path.basename(parse.unquote(parse.urlparse(url).path))
-    abs_filename = os.path.join(os.path.dirname(__file__), "beatpacks", filename)
+    abs_filename = os.path.join(download_folder, filename)
 
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as response:
@@ -58,11 +58,9 @@ async def download_decision(url):
                 filesize = os.path.getsize(abs_filename)
 
                 p_redownload = ind(
-                    f'''Redownload {q(filename)}?
+                    f'''Redownload {q(filename)}? y/n
     (local:  {await size(filesize)})
-    (server: {await size(expected_size)})
-    y/n\t'''
-                )
+    (server: {await size(expected_size)})\t''')
 
                 if filesize == expected_size:
                     pprint(p_skipped + " (match)")
@@ -76,34 +74,37 @@ async def download_decision(url):
                     else:
                         pprint(p_skipped + " (manual)")
             except OSError:
-                # File doesn't exist
                 pprint(p_starting)
                 await download_file(abs_filename, response, overwrite=False)
 
 
-async def download_batch(batch, urls):
+async def download_batch(batch, urls, download_folder):
     """Download files in current batch in parallel"""
     pprint(f"Batch {batch} - {time()}")
-    tasks = [download_decision(url) for url in urls]
+    tasks = [download_decision(url, download_folder) for url in urls]
     await asyncio.gather(*tasks)
 
 
-if __name__ == "__main__":
+def start():
+    """Main"""
+    pprint("==== AutoBeatPack by Saltssaumure ====\n")
     try:
-        start, end, batch_size = 1230, 1411, 3
-        folder = os.path.dirname(os.path.abspath(__file__))
-        all_urls = split_list(make_all_urls(start, end), batch_size)
+        first, last, batch_size, download_folder = get_config()
 
-        pprint(
-            f"Downloading {start} to {end}, in groups of {batch_size}, to {folder}")
+        all_urls = split_list(make_all_urls(first, last), batch_size)
         for idx, batch_urls in enumerate(all_urls):
-            asyncio.run(download_batch(idx+1, batch_urls))
-        pprint(f"All complete - {time()}")
+            asyncio.run(download_batch(idx+1, batch_urls, download_folder))
+
+        pprint(f"\nAll complete - {time()}")
     except KeyboardInterrupt:
-        pprint(f"Download(s) cancelled - {time()}")
+        pprint(f"\nDownload(s) cancelled - {time()}")
     except TimeoutError as e:
-        pprint(f"Download(s) cancelled - {time()}: Connection timed out. {e}")
+        pprint(f"\nDownload(s) cancelled - {time()}: Connection timed out. {e}")
     except aiohttp.client_exceptions.ClientConnectorError as e:
-        pprint(f"Download(s) cancelled - {time()}: Can't connect. {e}")
-    # except Exception as e:  # pylint: disable=broad-except
-    #     pprint(f"Stopped due to error - {time()}: {e}")
+        pprint(f"\nDownload(s) cancelled - {time()}: Can't connect. {e}")
+    except ValueError:
+        pprint("\nInvalid config.txt value(s), see README for help.")
+
+
+if __name__ == "__main__":
+    start()
