@@ -1,14 +1,16 @@
-# Virtual environment
-/.venv
+# All top-level folders except
+/*
+!/lib
+!/.vscode
+!/preview
 
-# Generated
-/lib/__pycache__
+# Downloaded files
+*.7z
+*.rar
+*.zip
 
 # Test
 test.py
 
-# Downloaded files
-/beatpacks
-*.7z
-*.rar
-*.zip
+# Generated
+/**/__pycache__
