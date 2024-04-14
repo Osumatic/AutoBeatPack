@@ -31,8 +31,8 @@ def get_config():
     config_user = raw_config[user]
 
     cf_first, cf_last, cf_batch_size = [
-        config_user.getint("First"),
-        config_user.getint("Last"),
+        config_user.getint("FirstPack"),
+        config_user.getint("LastPack"),
         config_user.getint("BatchSize")
     ]
     cf_download_folder = os.path.join(os.path.dirname(__file__), config_user["DownloadFolder"])
