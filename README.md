@@ -30,7 +30,9 @@ All commands are run in the main AutoBeatPack folder.
    - PowerShell: `.venv\Scripts\Activate.ps1`  
    - Command Prompt: `.venv\Scripts\activate.bat`
    - macOS / Linux: `source myvenv/bin/activate`
-3. Run script
+3. Install requirements
+   - `python -m pip install -r requirements.txt`
+4. Run script
    - `python download.py`
 
 ## Config
