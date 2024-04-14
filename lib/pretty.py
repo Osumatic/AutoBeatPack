@@ -2,7 +2,7 @@
 
 from datetime import datetime as _datetime
 
-__all__ = ["q", "pprint", "time", "size", "indent"]
+__all__ = ["q", "pprint", "time", "size", "ind"]
 
 
 def q(string):
@@ -15,7 +15,7 @@ def time():
     return _datetime.now().strftime("%H:%M::%S")
 
 
-def indent(string, spaces=2):
+def ind(string, spaces=2):
     """Indent string by number of spaces"""
     return f"{' ' * spaces}{string}"
 

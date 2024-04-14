@@ -10,7 +10,7 @@ from urllib import parse
 import aiohttp
 
 import aiohttp.client_exceptions
-from lib.pretty import pprint, q, time, size
+from lib.pretty import pprint, q, time, size, ind
 from lib.lists import split_list, make_all_urls
 
 
@@ -37,9 +37,9 @@ async def download_file(abs_filename, response, overwrite):
             new_prog = int(percent / increment)
             if new_prog > old_prog:
                 old_prog = new_prog
-                pprint(f"  {q(filename)} - {percent:.0f}%")
+                pprint(ind(f"{q(filename)} - {percent:.0f}%"))
 
-    pprint(f"  Downloaded {q(filename)}!")
+    pprint(f"Downloaded {q(filename)}!")
 
 
 async def download_decision(url):
@@ -52,15 +52,17 @@ async def download_decision(url):
             try:
                 expected_size = int(response.headers["Content-Length"])
 
-                p_starting = f"  Starting {q(filename)} (server: {await size(expected_size)})"
-                p_skipped = f"  Skipped {q(filename)}"
+                p_starting = ind(f'Starting {q(filename)} (server: {await size(expected_size)})')
+                p_skipped = ind(f'Skipped {q(filename)}')
 
                 filesize = os.path.getsize(abs_filename)
 
-                p_redownload = f"""  Redownload {q(filename)}?
+                p_redownload = ind(
+                    f'''Redownload {q(filename)}?
     (local:  {await size(filesize)})
     (server: {await size(expected_size)})
-    y/n"""
+    y/n\t'''
+                )
 
                 if filesize == expected_size:
                     pprint(p_skipped + " (match)")
@@ -88,7 +90,7 @@ async def download_batch(batch, urls):
 
 if __name__ == "__main__":
     try:
-        start, end, batch_size = 1194, 1411, 3
+        start, end, batch_size = 1230, 1411, 3
         folder = os.path.dirname(os.path.abspath(__file__))
         all_urls = split_list(make_all_urls(start, end), batch_size)
 

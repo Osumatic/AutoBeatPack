@@ -4,7 +4,7 @@ Automatic parallel download of osu! beatmap packs from the official source. No m
 
 ## Setup and usage
 ### Requirements
-- Python >=3.4
+- Python >=3.4 (3.12 tested)
 
 ### Commands
 All commands are run in the main AutoBeatPack folder.
