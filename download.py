@@ -42,10 +42,12 @@ async def download_file(abs_filename, response, overwrite):
     pprint(f"Downloaded {q(filename)}!")
 
 
-async def download_decision(url, download_folder):
+async def download_decision(url, abs_download_folder):
     """Decide whether to download file from url based on local file contents."""
     filename = os.path.basename(parse.unquote(parse.urlparse(url).path))
-    abs_filename = os.path.join(download_folder, filename)
+    abs_filename = os.path.join(abs_download_folder, filename)
+    if not os.path.exists(abs_download_folder):
+        os.makedirs(abs_download_folder)
 
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as response:
@@ -78,10 +80,10 @@ async def download_decision(url, download_folder):
                 await download_file(abs_filename, response, overwrite=False)
 
 
-async def download_batch(batch, urls, download_folder):
+async def download_batch(batch, urls, abs_download_folder):
     """Download files in current batch in parallel"""
     pprint(f"Batch {batch} - {time()}")
-    tasks = [download_decision(url, download_folder) for url in urls]
+    tasks = [download_decision(url, abs_download_folder) for url in urls]
     await asyncio.gather(*tasks)
 
 
@@ -89,11 +91,11 @@ def start():
     """Main"""
     pprint("==== AutoBeatPack by Saltssaumure ====\n")
     try:
-        first, last, batch_size, download_folder = get_config()
+        first, last, batch_size, abs_download_folder = get_config()
 
         all_urls = split_list(make_all_urls(first, last), batch_size)
         for idx, batch_urls in enumerate(all_urls):
-            asyncio.run(download_batch(idx+1, batch_urls, download_folder))
+            asyncio.run(download_batch(idx+1, batch_urls, abs_download_folder))
 
         pprint(f"\nAll complete - {time()}")
     except KeyboardInterrupt:

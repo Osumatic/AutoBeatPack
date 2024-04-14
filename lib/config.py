@@ -3,7 +3,7 @@ Utils for reading config.txt
 """
 
 import configparser
-import os
+from os import path
 
 from lib.pretty import ind, pprint, q
 
@@ -35,11 +35,14 @@ def get_config():
         config_user.getint("LastPack"),
         config_user.getint("BatchSize")
     ]
-    cf_download_folder = os.path.join(os.path.dirname(__file__), config_user["DownloadFolder"])
+    cf_abs_download_folder = path.join(
+        path.dirname(path.dirname(__file__)),
+        config_user["DownloadFolder"]
+    )
 
     pprint(ind(f"Beatmap packs:   {cf_first} to {cf_last}"))
     pprint(ind(f"Batch size:      {cf_batch_size}"))
-    pprint(ind(f"Download folder: {cf_download_folder}"""))
+    pprint(ind(f"Download folder: {cf_abs_download_folder}"""))
     input("Enter to begin, Ctrl+C to cancel.\n")
 
-    return cf_first, cf_last, cf_batch_size, cf_download_folder
+    return cf_first, cf_last, cf_batch_size, cf_abs_download_folder
