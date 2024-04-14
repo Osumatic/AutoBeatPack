@@ -1,8 +1,9 @@
-# All top-level folders except
-/*
-!/lib
-!/.vscode
-!/preview
+# All folders except
+/**
+!/lib/**/*
+!/.vscode/**/*
+!/preview/**/*
+!/*
 
 # Downloaded files
 *.7z
