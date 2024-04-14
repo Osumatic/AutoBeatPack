@@ -1,5 +1,5 @@
 """
-Utils for reading config.txt
+Reading config.txt utils
 """
 
 import configparser

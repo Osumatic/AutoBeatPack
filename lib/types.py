@@ -1,5 +1,5 @@
 """
-Types of beatmap packs and their naming conventions
+Beatmap types and naming conventions
 """
 
 pack_types = {

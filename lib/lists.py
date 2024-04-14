@@ -1,5 +1,5 @@
 """
-Functions for working with lists
+List utils
 """
 
 from urllib.parse import quote

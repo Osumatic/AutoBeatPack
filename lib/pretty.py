@@ -1,4 +1,6 @@
-"""Utility functions for pretty printing and string formatting"""
+"""
+String formatting utils
+"""
 
 from datetime import datetime as _datetime
 
