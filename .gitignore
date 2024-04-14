@@ -5,4 +5,7 @@
 test.py
 
 # Downloaded files
+/beatpacks
 *.7z
+*.rar
+*.zip
