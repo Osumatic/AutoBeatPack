@@ -23,7 +23,7 @@ def try_user(config, profile):
 def get_config():
     """Returns config values from config.txt"""
     raw_config = configparser.ConfigParser()
-    raw_config.read("config.txt")
+    raw_config.read("config.ini")
     profile = "DEFAULT"
     if input("Use DEFAULT config? y/n\t").lower() != "y":
         profile = input("Config profile name:\t")

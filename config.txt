@@ -1,8 +1,0 @@
-[DEFAULT]
-FirstPack   = 1
-LastPack    = 1411
-BatchSize   = 3
-DownloadFolder = beatpacks
-
-[Custom]
-FirstPack   = 1230
