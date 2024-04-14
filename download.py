@@ -15,6 +15,11 @@ def time():
     return datetime.now().strftime("%H:%M::%S")
 
 
+def q(string):
+    """Adds quotes around string"""
+    return f'"{string}"'
+
+
 def pprint(var):
     """Pretty printer for lists"""
     if not isinstance(var, list):
@@ -34,7 +39,8 @@ def make_all_urls(first_num, last_num):
     """Make list of URLs given an inclusive range"""
     urls = []
     for num in range(first_num, last_num+1):
-        urls.append(parse.quote_plus(f"https//packs.ppy.sh/S{num} - Beatmap Pack #{num}.7z"))
+        filename = f"S{num} - Beatmap Pack #{num}.7z"
+        urls.append(f"https://packs.ppy.sh/{parse.quote(filename)}")
     return urls
 
 
@@ -67,42 +73,45 @@ async def download_file(filename, response, overwrite):
             new_prog = int(percent / increment)
             if new_prog > old_prog:
                 old_prog = new_prog
-                print(f"  {filename} - {percent:.0f}%")
-    pprint(f"  Downloaded {filename}!")
+                print(f"  {q(filename)} - {percent:.0f}%")
+    pprint(f"  Downloaded {q(filename)}!")
 
 
 async def download_decision(url):
     """Decide whether to download file from url based on local file contents."""
     filename = os.path.basename(parse.unquote(parse.urlparse(url).path))
+    abs_filename = os.path.join(os.path.dirname(__file__), "beatpacks", filename)
 
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as response:
             try:
-                filesize = os.path.getsize(filename)
                 expected_size = int(response.headers["Content-Length"])
 
-                p_starting = f"  Starting {filename} {await size(expected_size)}"
-                p_skipped = f"  Skipped {filename}"
-                p_redownload = f"""  Redownload {filename}?
-                      (local:  {await size(filesize)}
-                      (server: {await size(expected_size)})
-                    y/n"""
+                p_starting = f"  Starting {q(filename)} (server: {await size(expected_size)})"
+                p_skipped = f"  Skipped {q(filename)}"
+
+                filesize = os.path.getsize(abs_filename)
+
+                p_redownload = f"""  Redownload {q(filename)}?
+    (local:  {await size(filesize)})
+    (server: {await size(expected_size)})
+    y/n"""
 
                 if filesize == expected_size:
                     pprint(p_skipped + " (match)")
                 elif filesize == 0:
                     pprint(p_starting)
-                    await download_file(filename, response, overwrite=True)
+                    await download_file(abs_filename, response, overwrite=True)
                 else:
                     if input(p_redownload + "\t").lower() == "y":
                         pprint(p_starting)
-                        await download_file(filename, response, overwrite=True)
+                        await download_file(abs_filename, response, overwrite=True)
                     else:
                         pprint(p_skipped + " (manual)")
             except OSError:
                 # File doesn't exist
                 pprint(p_starting)
-                await download_file(filename, response, overwrite=False)
+                await download_file(abs_filename, response, overwrite=False)
 
 
 async def download_batch(batch, urls):
@@ -113,7 +122,7 @@ async def download_batch(batch, urls):
 
 if __name__ == "__main__":
     try:
-        start, end, batch_size = 1084, 1411, 3
+        start, end, batch_size = 1194, 1411, 3
         folder = os.path.dirname(os.path.abspath(__file__))
         all_urls = split_list(make_all_urls(start, end), batch_size)
 
@@ -126,5 +135,5 @@ if __name__ == "__main__":
         pprint(f"Download(s) cancelled - {time()}")
     except TimeoutError as e:
         pprint(f"Download(s) cancelled - {time()}: Connection timed out. {e}")
-    except Exception as e:  # pylint: disable=broad-except
-        pprint(f"Stopped due to error - {time()}: {e}")
+    # except Exception as e:  # pylint: disable=broad-except
+        # pprint(f"Stopped due to error - {time()}: {e}")
