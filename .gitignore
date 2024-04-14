@@ -1,3 +1,8 @@
-*.7z
+# Virtual environment
 /.venv
-/.vscode
+
+# Test
+test.py
+
+# Downloaded files
+*.7z

@@ -1,105 +1,130 @@
-# https://packs.ppy.sh/S1084%20-%20Beatmap%20Pack%20%231084.7z
+"""
+AutoBeatPack
+"""
 
-import os
-from urllib import parse
 import asyncio
-import aiohttp
+import os
 from datetime import datetime
+from urllib import parse
+
+import aiohttp
+
 
 def time():
-    return datetime.now().strftime('%H:%M::%S')
+    """Current time in HH:MM::SS format"""
+    return datetime.now().strftime("%H:%M::%S")
+
 
 def pprint(var):
-    if not(isinstance(var, list)):
+    """Pretty printer for lists"""
+    if not isinstance(var, list):
         print(var)
     else:
         for item in var:
             print(item)
 
-def divideChunks(urls, chunkSize): 
-    for i in range(0, len(urls), chunkSize):  
-        yield urls[i:i + chunkSize]
 
-def makeAllUrls(start, end):
-    urls = [f"https://packs.ppy.sh/S{cur}%20-%20Beatmap%20Pack%20%23{cur}.7z" for cur in range(start, end+1)]
+def split_list(biglist, maxlen):
+    """Turn big list into list of smaller lists"""
+    for first_pos in range(0, len(biglist), maxlen):
+        yield biglist[first_pos:first_pos + maxlen]
+
+
+def make_all_urls(first_num, last_num):
+    """Make list of URLs given an inclusive range"""
+    urls = []
+    for num in range(first_num, last_num+1):
+        urls.append(parse.quote_plus(f"https//packs.ppy.sh/S{num} - Beatmap Pack #{num}.7z"))
     return urls
-    
+
+
 async def size(num):
+    """Formats byte size into readable units"""
     for unit in ["b", "KB", "MB"]:
         if num < 1024:
-            return f"{num:.3f}{unit}" 
-        else:
-            num /= 1024
+            return f"{num:.3f}{unit}"
+        num /= 1024
 
-async def download(filename, response, overwrite):
-    expectedSize = int(response.headers["Content-Length"])
+
+async def download_file(filename, response, overwrite):
+    """Download file and report progress"""
+    expected_size = int(response.headers["Content-Length"])
     mode = "wb" if overwrite else "xb"
     with open(filename, mode=mode) as file:
         filesize = 0
-        oldProgress = 0
+        old_prog = 0
         # Get and write chunks of 1024 bytes
         # Print progress every 1%
-        chunkSize = 1024
+        chunk_size = 1024
         increment = 10
         while True:
-            chunk = await response.content.read(chunkSize)
+            chunk = await response.content.read(chunk_size)
             if not chunk:
                 break
             file.write(chunk)
-            filesize += chunkSize
-            percent = filesize * 100 / expectedSize
-            progress = int(percent / increment)
-            if progress > oldProgress:
-                oldProgress = progress
+            filesize += chunk_size
+            percent = filesize * 100 / expected_size
+            new_prog = int(percent / increment)
+            if new_prog > old_prog:
+                old_prog = new_prog
                 print(f"  {filename} - {percent:.0f}%")
     pprint(f"  Downloaded {filename}!")
 
-async def downloadFromUrl(url):
+
+async def download_decision(url):
+    """Decide whether to download file from url based on local file contents."""
     filename = os.path.basename(parse.unquote(parse.urlparse(url).path))
 
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as response:
             try:
                 filesize = os.path.getsize(filename)
-                expectedSize = int(response.headers["Content-Length"])
+                expected_size = int(response.headers["Content-Length"])
 
-                pStarting = f"  Starting {filename} {await size(expectedSize)}"
-                pSkipped = f"  Skipped {filename}"
-                pRedownload = f"  Redownload {filename} (local: {await size(filesize)}, server: {await size(expectedSize)})? y/n"
+                p_starting = f"  Starting {filename} {await size(expected_size)}"
+                p_skipped = f"  Skipped {filename}"
+                p_redownload = f"""  Redownload {filename}?
+                      (local:  {await size(filesize)}
+                      (server: {await size(expected_size)})
+                    y/n"""
 
-                if filesize == expectedSize:
-                    pprint(pSkipped + " (match)")
+                if filesize == expected_size:
+                    pprint(p_skipped + " (match)")
                 elif filesize == 0:
-                    pprint(pStarting)
-                    await download(filename, response, overwrite=True)
+                    pprint(p_starting)
+                    await download_file(filename, response, overwrite=True)
                 else:
-                    if input(pRedownload + "\t").lower() == "y":
-                        pprint(pStarting)
-                        await download(filename, response, overwrite=True)
+                    if input(p_redownload + "\t").lower() == "y":
+                        pprint(p_starting)
+                        await download_file(filename, response, overwrite=True)
                     else:
-                        print(pSkipped + " (manual)")
-            except OSError as e:
+                        pprint(p_skipped + " (manual)")
+            except OSError:
                 # File doesn't exist
-                pprint(pStarting)
-                await download(filename, response, overwrite=False)
-            except Exception as e:
-                print(f"  Error {filename}: {e}")
+                pprint(p_starting)
+                await download_file(filename, response, overwrite=False)
 
-async def downloadFromUrls(batch, urls):
+
+async def download_batch(batch, urls):
+    """Download files in current batch in parallel"""
     pprint(f"Batch {batch} - {time()}")
-    tasks = [downloadFromUrl(url) for url in urls]
+    tasks = [download_decision(url) for url in urls]
     await asyncio.gather(*tasks)
 
 if __name__ == "__main__":
     try:
-        start, end, chunkSize = 1084, 1411, 3
+        start, end, batch_size = 1084, 1411, 3
         folder = os.path.dirname(os.path.abspath(__file__))
-        allUrls = divideChunks(makeAllUrls(start, end), chunkSize)
-        # allUrls = [["https://getsamplefiles.com/download/txt/sample-1.txt", "https://getsamplefiles.com/download/txt/sample-2.txt"],["https://getsamplefiles.com/download/txt/sample-3.txt"]]
+        all_urls = split_list(make_all_urls(start, end), batch_size)
 
-        pprint(f"Downloading {start} to {end}, in groups of {chunkSize}, to {folder}")
-        for i, urls in enumerate(allUrls):
-            asyncio.run(downloadFromUrls(i+1, urls))
+        pprint(
+            f"Downloading {start} to {end}, in groups of {batch_size}, to {folder}")
+        for idx, batch_urls in enumerate(all_urls):
+            asyncio.run(download_batch(idx+1, batch_urls))
         pprint(f"All complete - {time()}")
     except KeyboardInterrupt:
         pprint(f"Download(s) cancelled - {time()}")
+    except TimeoutError as e:
+        pprint(f"Download(s) cancelled - {time()}: Connection timed out. {e}")
+    except Exception as e:  # pylint: disable=broad-except
+        pprint(f"Stopped due to error - {time()}: {e}")
