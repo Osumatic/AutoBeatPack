@@ -4,59 +4,23 @@ AutoBeatPack
 
 import asyncio
 import os
-from datetime import datetime
+
 from urllib import parse
 
 import aiohttp
 
-
-def time():
-    """Current time in HH:MM::SS format"""
-    return datetime.now().strftime("%H:%M::%S")
-
-
-def q(string):
-    """Adds quotes around string"""
-    return f'"{string}"'
+import aiohttp.client_exceptions
+from lib.pretty import pprint, q, time, size
+from lib.lists import split_list, make_all_urls
 
 
-def pprint(var):
-    """Pretty printer for lists"""
-    if not isinstance(var, list):
-        print(var)
-    else:
-        for item in var:
-            print(item)
-
-
-def split_list(biglist, maxlen):
-    """Turn big list into list of smaller lists"""
-    for first_pos in range(0, len(biglist), maxlen):
-        yield biglist[first_pos:first_pos + maxlen]
-
-
-def make_all_urls(first_num, last_num):
-    """Make list of URLs given an inclusive range"""
-    urls = []
-    for num in range(first_num, last_num+1):
-        filename = f"S{num} - Beatmap Pack #{num}.7z"
-        urls.append(f"https://packs.ppy.sh/{parse.quote(filename)}")
-    return urls
-
-
-async def size(num):
-    """Formats byte size into readable units"""
-    for unit in ["b", "KB", "MB"]:
-        if num < 1024:
-            return f"{num:.3f}{unit}"
-        num /= 1024
-
-
-async def download_file(filename, response, overwrite):
+async def download_file(abs_filename, response, overwrite):
     """Download file and report progress"""
     expected_size = int(response.headers["Content-Length"])
     mode = "wb" if overwrite else "xb"
-    with open(filename, mode=mode) as file:
+    filename = os.path.basename(abs_filename)
+
+    with open(abs_filename, mode=mode) as file:
         filesize = 0
         old_prog = 0
         # Get and write chunks of 1024 bytes
@@ -73,7 +37,8 @@ async def download_file(filename, response, overwrite):
             new_prog = int(percent / increment)
             if new_prog > old_prog:
                 old_prog = new_prog
-                print(f"  {q(filename)} - {percent:.0f}%")
+                pprint(f"  {q(filename)} - {percent:.0f}%")
+
     pprint(f"  Downloaded {q(filename)}!")
 
 
@@ -120,6 +85,7 @@ async def download_batch(batch, urls):
     tasks = [download_decision(url) for url in urls]
     await asyncio.gather(*tasks)
 
+
 if __name__ == "__main__":
     try:
         start, end, batch_size = 1194, 1411, 3
@@ -135,5 +101,7 @@ if __name__ == "__main__":
         pprint(f"Download(s) cancelled - {time()}")
     except TimeoutError as e:
         pprint(f"Download(s) cancelled - {time()}: Connection timed out. {e}")
+    except aiohttp.client_exceptions.ClientConnectorError as e:
+        pprint(f"Download(s) cancelled - {time()}: Can't connect. {e}")
     # except Exception as e:  # pylint: disable=broad-except
-        # pprint(f"Stopped due to error - {time()}: {e}")
+    #     pprint(f"Stopped due to error - {time()}: {e}")

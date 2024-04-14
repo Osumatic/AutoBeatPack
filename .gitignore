@@ -1,6 +1,9 @@
 # Virtual environment
 /.venv
 
+# Generated
+/lib/__pycache__
+
 # Test
 test.py
 
