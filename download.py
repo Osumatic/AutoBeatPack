@@ -3,14 +3,15 @@ AutoBeatPack - Automatic parallel download of osu! beatmap packs from the offici
 """
 
 import asyncio
+from os import path
 
 import aiohttp
 import aiohttp.client_exceptions
 
-from lib.lists import make_all_urls, split_list
-from lib.pretty import pprint, time
 from lib.config import get_config
 from lib.downloader import download_batch
+from lib.lists import make_all_urls, split_list
+from lib.pretty import pprint, time
 
 
 def start():
@@ -21,8 +22,8 @@ def start():
     succeed_text = f"\nAll complete - {time()}"
     failed_text = f"\nStopped - {time()}"
     try:
-
-        first, last, batch_size, abs_download_folder = get_config(config_filename)
+        abs_here = path.dirname(__file__)
+        first, last, batch_size, abs_download_folder = get_config(config_filename, abs_here)
 
         all_urls = split_list(make_all_urls(first, last), batch_size)
         for idx, batch_urls in enumerate(all_urls):

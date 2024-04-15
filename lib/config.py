@@ -20,7 +20,7 @@ def try_user(config, profile):
         return try_user(config, profile)
 
 
-def get_config(config_filename):
+def get_config(config_filename, abs_here):
     """Returns config values from config.txt"""
     raw_config = configparser.ConfigParser()
     if not path.exists(config_filename):
@@ -40,10 +40,7 @@ def get_config(config_filename):
         config_user.getint("LastPack"),
         config_user.getint("BatchSize")
     ]
-    cf_abs_download_folder = path.join(
-        path.dirname(path.dirname(__file__)),
-        config_user["DownloadFolder"]
-    )
+    cf_abs_download_folder = path.join(abs_here, config_user["DownloadFolder"])
 
     pprint(ind(f"Beatmap packs:   {cf_first} to {cf_last}"))
     pprint(ind(f"Batch size:      {cf_batch_size}"))
