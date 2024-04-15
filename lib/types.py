@@ -4,12 +4,25 @@ Beatmap types and naming conventions
 
 pack_types = {
     "standard": {
-        "example": "{prefix}{suffix}{num} - {mode} Beatmap Pack #{num}",
+        "template": "{prefix}{suffix}{num} - {mode}Beatmap Pack #{num}.{ext}",
         "prefix": "S",
         "subtypes": {
             "osu!": {
                 "suffix": "",
-                "mode": "osu!"
+                "ranges": {
+                    range(1, 1299+1): {
+                        "mode": "",
+                        "ext": "7z"
+                    },
+                    range(1299+1, 1317+1): {
+                        "mode": "",
+                        "ext": "zip"
+                    },
+                    range(1371+1, 9999): {
+                        "mode": "osu! ",
+                        "ext": "zip"
+                    }
+                }
             },
             "osu!taiko": {
                 "suffix": "T",
@@ -26,33 +39,33 @@ pack_types = {
         }
     },
     "featured artist": {
-        "example": "{prefix}{num} - {artistname} Pack",
+        "template": "{prefix}{num} - {artistname} Pack",
         "prefix": "F"
     },
     "tournament": {
-        "example": "{prefix}{num} - {tournamentname}: {stage} Pack",
+        "template": "{prefix}{num} - {tournamentname}: {stage} Pack",
         "prefix": "P"
     },
     "loved": {
-        "example": "{prefix}{num} - Project Loved: {season} ({mode})",
+        "template": "{prefix}{num} - Project Loved: {season} ({mode})",
         "prefix": "L"
     },
     "spotlights": {
-        "example": "{prefix}{num} - Beatmap Spotlights {season} ({mode})",
+        "template": "{prefix}{num} - Beatmap Spotlights {season} ({mode})",
         "prefix": "R"
     },
     "theme": {
-        "example": "{prefix}{suffix}{num} - {packname}",
+        "template": "{prefix}{suffix}{num} - {packname}",
         "prefix": "T",
         "subtypes": {
             "centurion": {
-                "example": "{prefix}{suffix}{num} - Centurion Pack: {mapper}",
+                "template": "{prefix}{suffix}{num} - Centurion Pack: {mapper}",
                 "suffix": "M"
             }
         }
     },
     "artist/album": {
-        "example": "{prefix}{num} - {packname}",
+        "template": "{prefix}{num} - {packname}",
         "prefix": "A"
     }
 }

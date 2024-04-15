@@ -36,7 +36,7 @@ def start():
         pprint(f"{failed_text}: Connection timed out. {err}")
     except aiohttp.client_exceptions.ClientConnectorError as err:
         pprint(f"{failed_text}: Can't connect. {err}")
-    except (FileNotFoundError, ValueError) as err:
+    except FileNotFoundError as err:
         pprint(f"{failed_text}: Invalid {config_filename} - {err}")
 
 
