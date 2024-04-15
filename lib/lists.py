@@ -15,12 +15,12 @@ def split_list(biglist, maxlen):
         yield biglist[first_pos:first_pos + maxlen]
 
 
-def make_url(num):
+def make_url(num, pack_category, pack_mode):
     "Make URL given beatpack number"
-    pack_type = "standard"
-    pack_subtype = "osu!"
+    if pack_category == "standard":
+        pack_subtype = pack_mode
 
-    pack_info = pack_types[pack_type]
+    pack_info = pack_types[pack_category]
     pack_subinfo = pack_info["subtypes"][pack_subtype]
     for num_range, pack_rangeinfo in pack_subinfo["ranges"].items():
         if num in num_range:
@@ -30,16 +30,16 @@ def make_url(num):
         prefix=pack_info["prefix"],
         suffix=pack_subinfo["suffix"],
         num=num,
-        mode=pack_rangeinfo["mode"],
-        ext=pack_rangeinfo["ext"]
+        mode=pack_rangeinfo["mode"],  # pylint: disable=undefined-loop-variable
+        ext=pack_rangeinfo["ext"]  # pylint: disable=undefined-loop-variable
     )
 
     return f"https://packs.ppy.sh/{parse.quote(filename)}"
 
 
-def make_all_urls(first_num, last_num):
+def make_all_urls(first_num, last_num, pack_category, pack_mode):
     """Make list of URLs given an inclusive range"""
     urls = []
     for num in range(first_num, last_num+1):
-        urls.append(make_url(num))
+        urls.append(make_url(num, pack_category, pack_mode))
     return urls

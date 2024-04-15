@@ -23,9 +23,11 @@ def start():
     failed_text = f"\nStopped - {time()}"
     try:
         abs_here = path.dirname(__file__)
-        first, last, batch_size, abs_download_folder = get_config(config_filename, abs_here)
+        first, last, batch_size, abs_download_folder, pack_category, pack_mode = get_config(
+            config_filename, abs_here
+        )
 
-        all_urls = split_list(make_all_urls(first, last), batch_size)
+        all_urls = split_list(make_all_urls(first, last, pack_category, pack_mode), batch_size)
         for idx, batch_urls in enumerate(all_urls):
             asyncio.run(download_batch(idx+1, batch_urls, abs_download_folder))
 

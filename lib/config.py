@@ -16,7 +16,7 @@ def try_user(config, profile):
         config[profile]  # pylint: disable=pointless-statement
         return profile
     except KeyError:
-        profile = input(f"{q(profile)} not found:\t")
+        profile = input(f"{q(profile)} not found:\t\t")
         return try_user(config, profile)
 
 
@@ -38,13 +38,17 @@ def get_config(config_filename, abs_here):
     cf_first, cf_last, cf_batch_size = [
         config_user.getint("FirstPack"),
         config_user.getint("LastPack"),
-        config_user.getint("BatchSize")
+        config_user.getint("BatchSize"),
     ]
     cf_abs_download_folder = path.join(abs_here, config_user["DownloadFolder"])
+    cf_pack_category = config_user["PackCategory"].lower()
+    cf_pack_mode = config_user["PackMode"].lower()
 
     pprint(ind(f"Beatmap packs:   {cf_first} to {cf_last}"))
     pprint(ind(f"Batch size:      {cf_batch_size}"))
     pprint(ind(f"Download folder: {cf_abs_download_folder}"""))
+    pprint(ind(f"Pack category:   {cf_pack_category}"))
+    pprint(ind(f"Pack mode:       {cf_pack_mode}"))
     input("Enter to begin, Ctrl+C to cancel.\n")
 
-    return cf_first, cf_last, cf_batch_size, cf_abs_download_folder
+    return cf_first, cf_last, cf_batch_size, cf_abs_download_folder, cf_pack_category, cf_pack_mode

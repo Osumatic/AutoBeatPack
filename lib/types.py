@@ -14,11 +14,11 @@ pack_types = {
                         "mode": "",
                         "ext": "7z"
                     },
-                    range(1299+1, 1317+1): {
+                    range(1300, 1317+1): {
                         "mode": "",
                         "ext": "zip"
                     },
-                    range(1371+1, 9999): {
+                    range(1318, 9999): {
                         "mode": "osu! ",
                         "ext": "zip"
                     }
@@ -26,15 +26,54 @@ pack_types = {
             },
             "osu!taiko": {
                 "suffix": "T",
-                "mode": "osu!taiko"
+                "ranges": {
+                    range(1, 224+1): {
+                        "mode": "Taiko ",
+                        "ext": "7z"
+                    },
+                    range(225, 236+1): {
+                        "mode": "Taiko ",
+                        "ext": "zip"
+                    },
+                    range(237, 9999): {
+                        "mode": "osu!taiko ",
+                        "ext": "zip"
+                    }
+                }
             },
             "osu!mania": {
                 "suffix": "M",
-                "mode": "osu!mania"
+                "ranges": {
+                    range(1, 154+1): {
+                        "mode": "Mania ",
+                        "ext": "7z"
+                    },
+                    range(155, 172+1): {
+                        "mode": "Mania ",
+                        "ext": "zip"
+                    },
+                    range(173, 9999): {
+                        "mode": "osu!mania ",
+                        "ext": "zip"
+                    }
+                }
             },
             "osu!catch": {
                 "suffix": "C",
-                "mode": "osu!catch"
+                "ranges": {
+                    range(1, 80+1): {
+                        "mode": "Catch the Beat ",
+                        "ext": "7z"
+                    },
+                    range(81, 85+1): {
+                        "mode": "Catch the Beat ",
+                        "ext": "zip"
+                    },
+                    range(86, 9999): {
+                        "mode": "osu!catch ",
+                        "ext": "zip"
+                    }
+                }
             }
         }
     },
