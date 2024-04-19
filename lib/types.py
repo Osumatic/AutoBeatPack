@@ -61,7 +61,15 @@ pack_types = {
             "osu!catch": {
                 "suffix": "C",
                 "ranges": {
-                    range(1, 80+1): {
+                    range(1, 57+1): {
+                        "mode": "Catch the Beat ",
+                        "ext": "7z"
+                    },
+                    range(58, 58+1): {
+                        "mode": "osu!catch ",
+                        "ext": "zip"
+                    },
+                    range(59, 80+1): {
                         "mode": "Catch the Beat ",
                         "ext": "7z"
                     },
@@ -78,12 +86,22 @@ pack_types = {
         }
     },
     "featured artist": {
-        "template": "{prefix}{num} - {artistname} Pack",
-        "prefix": "F"
+        "template": "{prefix}{num} - {artist} Pack",
+        "prefix": "F",
+        "subtypes": ["in love with a ghost", "Rohi", "USAO"]
     },
     "tournament": {
-        "template": "{prefix}{num} - {tournamentname}: {stage} Pack",
-        "prefix": "P"
+        "template": "{prefix}{num} - {mode} World Cup {year}: {stage} Pack",
+        "prefix": "P",
+        "years": range(2015, 2024+1),
+        "stages": ["Group Stage", "Round of {count}", "Quarterfinals", "Semifinals", "Finals"],
+        "subtypes": {
+            "osu!": {},
+            "osu!taiko": {},
+            "osu!mania 4K": {},
+            "osu!mania 7K": {},
+            "osu!catch": {}
+        }
     },
     "loved": {
         "template": "{prefix}{num} - Project Loved: {season} ({mode})",
