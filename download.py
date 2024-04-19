@@ -10,6 +10,7 @@ import aiohttp.client_exceptions
 
 from lib.config import get_config
 from lib.downloader import download_batch
+from lib.error import DownloadError, FAILED_TEXT
 from lib.lists import make_all_urls, split_list
 from lib.pretty import pprint, time
 
@@ -20,7 +21,7 @@ def start():
 
     config_filename = "config.ini"
     succeed_text = f"\nAll complete - {time()}"
-    failed_text = f"\nStopped - {time()}"
+
     try:
         abs_here = path.dirname(__file__)
         first, last, batch_size, abs_download_folder, pack_category, pack_mode = get_config(
@@ -33,13 +34,30 @@ def start():
 
         pprint(succeed_text)
     except KeyboardInterrupt:
-        pprint(f"{failed_text}: User cancelled.")
-    except TimeoutError as err:
-        pprint(f"{failed_text}: Connection timed out. {err}")
-    except aiohttp.client_exceptions.ClientConnectorError as err:
-        pprint(f"{failed_text}: Can't connect. {err}")
-    except FileNotFoundError as err:
-        pprint(f"{failed_text}: Invalid {config_filename} - {err}")
+        pprint(FAILED_TEXT.format(
+            time=time(),
+            msg="User cancelled."
+        ))
+    except TimeoutError as exc:
+        pprint(FAILED_TEXT.format(
+            time=time(),
+            msg=f"Connection timed out. {exc}"
+        ))
+    except aiohttp.client_exceptions.ClientConnectorError as exc:
+        pprint(FAILED_TEXT.format(
+            time=time(),
+            msg=f"Can't connect. {exc}"
+        ))
+    except FileNotFoundError as exc:
+        pprint(FAILED_TEXT.format(
+            time=time(),
+            msg=f"Invalid {config_filename}. {exc}"
+        ))
+    except DownloadError as exc:
+        pprint(FAILED_TEXT.format(
+            time=time(),
+            msg="Download failed: {exc}"
+        ))
 
 
 if __name__ == "__main__":

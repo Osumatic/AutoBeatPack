@@ -8,6 +8,7 @@ from urllib import parse
 
 import aiohttp
 
+from lib.error import DownloadError
 from lib.pretty import ind, pprint, q, size, time
 
 __all__ = ["download_batch", "download_decision", "download_file"]
@@ -20,10 +21,10 @@ async def download_file(abs_filename, response, expected_size, mode_desc, filesi
         "overwrite": "wb",
         "append": "ab",
     }
-    if mode_desc in modes:
-        mode = modes[mode_desc]
-    else:
-        raise ValueError(f"invalid mode {q(mode_desc)}")
+
+    if mode_desc not in modes:
+        raise DownloadError(f"Invalid mode {q(mode_desc)}")
+    mode = modes[mode_desc]
     filename = os.path.basename(abs_filename)
 
     with open(abs_filename, mode=mode) as file:  # pylint: disable=unspecified-encoding
@@ -43,8 +44,7 @@ async def download_file(abs_filename, response, expected_size, mode_desc, filesi
             if new_prog > old_prog:
                 old_prog = new_prog
                 pprint(ind(f"{q(filename)} - {percent:.0f}%"))
-
-    pprint(f"Downloaded {q(filename)}!")
+    pprint(f"{ind(f'Downloaded {q(filename)}!')}")
 
 
 async def download_decision(url, abs_download_folder):
@@ -58,9 +58,12 @@ async def download_decision(url, abs_download_folder):
         os.makedirs(abs_download_folder)
 
     # Get expected size of whole file
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url) as response:
-            expected_size = int(response.headers["Content-Length"])
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as response:
+                expected_size = int(response.headers["Content-Length"])
+    except KeyError as exc:
+        raise DownloadError(f"Could not get size of {q(filename)} from {q(url)}") from exc
 
     # Decide whether to download file
     async with aiohttp.ClientSession(headers={"Range": f"bytes={filesize}-"}) as session:
