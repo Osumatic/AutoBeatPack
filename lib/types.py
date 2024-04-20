@@ -86,9 +86,9 @@ pack_types = {
         }
     },
     "featured artist": {
-        "template": "{prefix}{num} - {artist} Pack",
+        "template": "{prefix}{num} - {artist} Pack.zip",
         "prefix": "F",
-        "subtypes": ["in love with a ghost", "Rohi", "USAO"]
+        "artists": ["USAO", "Rohi", "in love with a ghost"]
     },
     "tournament": {
         "template": "{prefix}{num} - {mode} World Cup {year}: {stage} Pack",
