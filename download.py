@@ -11,8 +11,9 @@ import aiohttp.client_exceptions
 from lib.config import get_config
 from lib.downloader import download_batch
 from lib.error import DownloadError, FAILED_TEXT
-from lib.lists import make_all_urls, split_list
+from lib.urls import make_all_urls, split_list
 from lib.pretty import pprint, time
+from lib.disk import make_folders
 
 
 def start():
@@ -24,11 +25,16 @@ def start():
 
     try:
         abs_here = path.dirname(__file__)
+        abs_url_folder = path.join(abs_here, "url")
         first, last, batch_size, abs_download_folder, pack_category, pack_mode = get_config(
             config_filename, abs_here
         )
 
-        all_urls = split_list(make_all_urls(first, last, pack_category, pack_mode), batch_size)
+        make_folders(abs_url_folder, abs_download_folder)
+
+        all_urls = split_list(make_all_urls(
+            first, last, abs_url_folder, pack_category, pack_mode
+        ), batch_size)
         for idx, batch_urls in enumerate(all_urls):
             asyncio.run(download_batch(idx+1, batch_urls, abs_download_folder))
 

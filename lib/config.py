@@ -42,7 +42,7 @@ def get_config(config_filename, abs_here):
     ]
     cf_abs_download_folder = path.join(abs_here, config_user["DownloadFolder"])
     cf_pack_category = config_user["PackCategory"].lower()
-    cf_pack_mode = config_user["PackMode"].lower()
+    cf_pack_mode = config_user["PackMode"].lower() if cf_pack_category == "standard" else None
 
     pprint(ind(f"Beatmap packs:   {cf_first} to {cf_last}"))
     pprint(ind(f"Batch size:      {cf_batch_size}"))

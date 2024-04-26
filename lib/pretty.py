@@ -2,7 +2,7 @@
 String formatting utils
 """
 
-from datetime import datetime as _datetime
+from datetime import datetime
 
 __all__ = ["q", "pprint", "time", "size", "ind"]
 
@@ -14,7 +14,7 @@ def q(string):
 
 def time():
     """Current time in HH:MM::SS format"""
-    return _datetime.now().strftime("%H:%M::%S")
+    return datetime.now().strftime("%H:%M::%S")
 
 
 def ind(string, spaces=2):

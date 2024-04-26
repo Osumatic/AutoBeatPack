@@ -15,6 +15,9 @@
 test.py
 todo.txt
 
+# SECRET
+api_keys.*
+
 # Generated
 /**/__pycache__
 download.spec
