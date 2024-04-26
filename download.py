@@ -11,7 +11,7 @@ import aiohttp.client_exceptions
 from lib.config import get_config
 from lib.disk import OpenModes, make_folders, save_list
 from lib.downloader import download_batch
-from lib.error import FAILED_TEXT, DownloadError
+from lib.error import FAILED_TEXT, ConfigError, DownloadError
 from lib.packtypes import PACK_TYPES
 from lib.pretty import pprint, time
 from lib.urls import make_all_urls, split_list
@@ -33,7 +33,7 @@ def start():
 
         make_folders(abs_url_folder, abs_download_folder)
 
-        all_urls = make_all_urls(packs_range, abs_url_folder, pack_category, pack_mode)
+        all_urls = make_all_urls(packs_range, pack_category, pack_mode)
         abs_url_category_folder = path.join(abs_url_folder, PACK_TYPES[pack_category]["title"])
         save_list(abs_url_category_folder, "urls.txt", all_urls, mode=OpenModes.OVERWRITE)
 
@@ -57,15 +57,20 @@ def start():
             time=time(),
             msg=f"Can't connect. {exc}"
         ))
-    except FileNotFoundError as exc:
-        pprint(FAILED_TEXT.format(
-            time=time(),
-            msg=f"Invalid {config_filename}. {exc}"
-        ))
     except DownloadError as exc:
         pprint(FAILED_TEXT.format(
             time=time(),
-            msg="Download failed: {exc}"
+            msg=f"Download failed. {exc}"
+        ))
+    except FileNotFoundError as exc:
+        pprint(FAILED_TEXT.format(
+            time=time(),
+            msg=f"File not found. {exc}"
+        ))
+    except ConfigError as exc:
+        pprint(FAILED_TEXT.format(
+            time=time(),
+            msg=f"Invalid config, {exc}"
         ))
 
 

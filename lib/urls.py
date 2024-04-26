@@ -2,12 +2,9 @@
 Beatmap download url utils
 """
 
-import os.path as path
-
 from ossapi import Ossapi
 
 from lib.packtypes import PACK_TYPES
-from lib.disk import save_list, OpenModes
 
 __all__ = ["get_osu_id", "split_list", "make_all_urls"]
 
@@ -26,7 +23,7 @@ def split_list(biglist, maxlen):
         yield biglist[first_pos:first_pos + maxlen]
 
 
-def make_all_urls(packs_range: range, abs_url_folder: str, pack_category: str, pack_mode: str):
+def make_all_urls(packs_range: range, pack_category: str, pack_mode: str):
     """Make list of URLs given an inclusive range"""
     client_id, client_secret = get_osu_id()
 

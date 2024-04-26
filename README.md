@@ -69,7 +69,7 @@ This script has several config profiles provided in `config.txt` for quick usage
 - Default: `3`
 #### DownloadFolder
 - Location to store downloaded beatmap packs
-- Relative to the main AutoBeatPack folder.
+- Relative to the main AutoBeatPack folder OR anywhere if a full absolute path is given.
 - Default: `beatpacks`
 #### PackCategory
 - Beatmap pack type

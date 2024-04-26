@@ -5,7 +5,9 @@ Reading config.txt utils
 import configparser
 from os import path
 
+from lib.error import ConfigError
 from lib.pretty import ind, pprint, q
+from lib.packtypes import PACK_TYPES
 
 __all__ = ["try_user", "get_config"]
 
@@ -27,7 +29,7 @@ def get_config(config_filename: str, abs_here: str):
         raise FileNotFoundError("file not found.")
     raw_config.read(config_filename)
     if len(raw_config.sections()) == 0:
-        raise ValueError("file missing profiles.")
+        raise ConfigError("file missing profiles.")
 
     profile = "DEFAULT"
     if input(f"Use {q(profile)} profile? [Y/n]\t").lower() == "n":
@@ -45,11 +47,22 @@ def get_config(config_filename: str, abs_here: str):
     cf_pack_category = config_user["PackCategory"].lower()
     cf_pack_mode = config_user["PackMode"].lower() if cf_pack_category == "standard" else None
 
-    pprint(ind(f"Beatmap packs:   {cf_first} to {cf_last}"))
-    pprint(ind(f"Batch size:      {cf_batch_size}"))
-    pprint(ind(f"Download folder: {cf_abs_download_folder}"""))
-    pprint(ind(f"Pack category:   {cf_pack_category}"))
-    pprint(ind(f"Pack mode:       {cf_pack_mode}"))
+    if cf_first < 1 or cf_last < 1:
+        raise ConfigError("pack numbers must be positive.")
+    if cf_first > cf_last:
+        raise ConfigError("first pack cannot be greater than last pack.")
+    if cf_batch_size < 1:
+        raise ConfigError("batch size must be positive.")
+    if cf_pack_category not in PACK_TYPES:
+        raise ConfigError("invalid pack category.")
+    if cf_pack_mode and cf_pack_mode not in PACK_TYPES[cf_pack_category]["subtypes"]:
+        raise ConfigError("invalid pack mode.")
+
+    pprint(ind(f"Beatmap packs:    {cf_first} to {cf_last} ({len(cf_range)} packs)"))
+    pprint(ind(f"Batch size:       {cf_batch_size} pack per batch"))
+    pprint(ind(f"Download folder:  {cf_abs_download_folder}"""))
+    pprint(ind(f"Pack category:    {PACK_TYPES[cf_pack_category]['title']}"))
+    pprint(ind(f"Pack mode:        {cf_pack_mode}"))
     input("Enter to begin, Ctrl+C to cancel.\n")
 
     return cf_range, cf_batch_size, cf_abs_download_folder, cf_pack_category, cf_pack_mode
