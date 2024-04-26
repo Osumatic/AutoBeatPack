@@ -9,11 +9,12 @@ import aiohttp
 import aiohttp.client_exceptions
 
 from lib.config import get_config
+from lib.disk import OpenModes, make_folders, save_list
 from lib.downloader import download_batch
-from lib.error import DownloadError, FAILED_TEXT
-from lib.urls import make_all_urls, split_list
+from lib.error import FAILED_TEXT, DownloadError
+from lib.packtypes import PACK_TYPES
 from lib.pretty import pprint, time
-from lib.disk import make_folders
+from lib.urls import make_all_urls, split_list
 
 
 def start():
@@ -26,16 +27,18 @@ def start():
     try:
         abs_here = path.dirname(__file__)
         abs_url_folder = path.join(abs_here, "url")
-        first, last, batch_size, abs_download_folder, pack_category, pack_mode = get_config(
+        packs_range, batch_size, abs_download_folder, pack_category, pack_mode = get_config(
             config_filename, abs_here
         )
 
         make_folders(abs_url_folder, abs_download_folder)
 
-        all_urls = split_list(make_all_urls(
-            first, last, abs_url_folder, pack_category, pack_mode
-        ), batch_size)
-        for idx, batch_urls in enumerate(all_urls):
+        all_urls = make_all_urls(packs_range, abs_url_folder, pack_category, pack_mode)
+        abs_url_category_folder = path.join(abs_url_folder, PACK_TYPES[pack_category]["title"])
+        save_list(abs_url_category_folder, "urls.txt", all_urls, mode=OpenModes.OVERWRITE)
+
+        all_urls_split = split_list(all_urls, batch_size)
+        for idx, batch_urls in enumerate(all_urls_split):
             asyncio.run(download_batch(idx+1, batch_urls, abs_download_folder))
 
         pprint(succeed_text)

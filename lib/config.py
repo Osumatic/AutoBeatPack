@@ -10,7 +10,7 @@ from lib.pretty import ind, pprint, q
 __all__ = ["try_user", "get_config"]
 
 
-def try_user(config, profile):
+def try_user(config: configparser.ConfigParser, profile: str):
     """Recursively receives user input until valid config name entered."""
     try:
         config[profile]  # pylint: disable=pointless-statement
@@ -20,7 +20,7 @@ def try_user(config, profile):
         return try_user(config, profile)
 
 
-def get_config(config_filename, abs_here):
+def get_config(config_filename: str, abs_here: str):
     """Returns config values from config.txt"""
     raw_config = configparser.ConfigParser()
     if not path.exists(config_filename):
@@ -40,6 +40,7 @@ def get_config(config_filename, abs_here):
         config_user.getint("LastPack"),
         config_user.getint("BatchSize"),
     ]
+    cf_range = range(cf_first, cf_last + 1)
     cf_abs_download_folder = path.join(abs_here, config_user["DownloadFolder"])
     cf_pack_category = config_user["PackCategory"].lower()
     cf_pack_mode = config_user["PackMode"].lower() if cf_pack_category == "standard" else None
@@ -51,4 +52,4 @@ def get_config(config_filename, abs_here):
     pprint(ind(f"Pack mode:       {cf_pack_mode}"))
     input("Enter to begin, Ctrl+C to cancel.\n")
 
-    return cf_first, cf_last, cf_batch_size, cf_abs_download_folder, cf_pack_category, cf_pack_mode
+    return cf_range, cf_batch_size, cf_abs_download_folder, cf_pack_category, cf_pack_mode

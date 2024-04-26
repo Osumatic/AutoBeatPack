@@ -2,6 +2,7 @@
 Beatmap types and naming conventions
 """
 
+
 PACK_TYPES = {
     "standard": {
         "title": "Standard",

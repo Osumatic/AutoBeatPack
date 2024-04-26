@@ -10,24 +10,17 @@ import aiohttp
 
 from lib.error import DownloadError
 from lib.pretty import ind, pprint, q, size, time
+from lib.disk import OpenModes
 
 __all__ = ["download_batch", "download_decision", "download_file"]
 
 
-async def download_file(abs_filename, response, expected_size, mode_desc, filesize=0):
+async def download_file(abs_filename: str, response: str, expected_size: int, mode: OpenModes, filesize: int = 0):
     """Download file and report progress"""
-    modes = {
-        "write": "xb",
-        "overwrite": "wb",
-        "append": "ab",
-    }
 
-    if mode_desc not in modes:
-        raise DownloadError(f"Invalid mode {q(mode_desc)}")
-    mode = modes[mode_desc]
     filename = os.path.basename(abs_filename)
 
-    with open(abs_filename, mode=mode) as file:  # pylint: disable=unspecified-encoding
+    with open(abs_filename, mode=mode.value) as file:  # pylint: disable=unspecified-encoding
         old_prog = 0
         # Get and write chunks of 1024 bytes
         # Print progress every 1%
@@ -47,7 +40,7 @@ async def download_file(abs_filename, response, expected_size, mode_desc, filesi
     pprint(f"{ind(f'Downloaded {q(filename)}!')}")
 
 
-async def download_decision(url, abs_download_folder):
+async def download_decision(url: str, abs_download_folder: str):
     """Decide whether to download file from url based on local file contents."""
     filename = os.path.basename(parse.unquote(parse.urlparse(url).path))
     abs_filename = os.path.join(abs_download_folder, filename)
@@ -76,20 +69,20 @@ async def download_decision(url, abs_download_folder):
 
             if not os.path.exists(abs_filename):
                 pprint(p_starting)
-                await download_file(abs_filename, response, expected_size, mode_desc="write")
+                await download_file(abs_filename, response, expected_size, OpenModes.WRITE_BYTE)
             elif filesize == 0:
                 pprint(p_starting)
-                await download_file(abs_filename, response, expected_size, mode_desc="overwrite")
+                await download_file(abs_filename, response, expected_size, OpenModes.OVERWRITE_BYTE)
             elif filesize >= expected_size:
                 pprint(p_skipped)
             else:
                 pprint(p_resuming)
                 await download_file(
-                    abs_filename, response, expected_size, mode_desc="append", filesize=filesize
+                    abs_filename, response, expected_size, OpenModes.APPEND_BYTE, filesize=filesize
                 )
 
 
-async def download_batch(batch, urls, abs_download_folder):
+async def download_batch(batch: int, urls: list[str], abs_download_folder: str):
     """Download files in current batch in parallel"""
     pprint(f"Batch {batch} - {time()}")
     tasks = [download_decision(url, abs_download_folder) for url in urls]
