@@ -23,6 +23,10 @@ PACK_TYPES = {
             "osu!catch": {
                 "title": "osu!catch",
                 "prefix": "C"
+            },
+            "loved": {
+                "title": "Loved",
+                "prefix": "L"
             }
         }
     },
@@ -35,7 +39,7 @@ PACK_TYPES = {
         "prefix": "P",
     },
     "loved": {
-        "title": "Loved",
+        "title": "Project Loved",
         "prefix": "L"
     },
     "chart": {

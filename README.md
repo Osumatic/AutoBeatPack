@@ -18,37 +18,51 @@ Automatic parallel download of osu! beatmap packs from the official source. No m
 ![A screenshot of AutoBeatPack running in Powershell.][preview]
 
 ## Setup and usage
+All commands are run in the main AutoBeatPack folder.
+
 ### Requirements
 - Python >=3.4 (3.11-3.12 tested)
 
-### Commands
-All commands are run in the main AutoBeatPack folder.
-
+### Script setup
 1. Create virtual environment
-   - `python -m venv .venv`
+    - `python -m venv .venv`
 2. Activate virtual environment
-   - PowerShell: `.venv\Scripts\Activate.ps1`  
-   - Command Prompt: `.venv\Scripts\activate.bat`
-   - macOS / Linux: `source myvenv/bin/activate`
+    - PowerShell: `.venv\Scripts\Activate.ps1`  
+    - Command Prompt: `.venv\Scripts\activate.bat`
+    - macOS / Linux: `source myvenv/bin/activate`
 3. Install requirements
-   - `python -m pip install -r requirements.txt`
-4. Run script
-   - `python download.py`
+    - `python -m pip install -r requirements.txt`
+
+### OAuth setup
+The API key is used to get the latest list of beatmap packs from the osu! website every time the script is run.
+1. Go to [osu! account settings](https://osu.ppy.sh/home/account/edit#oauth) and click "New OAuth Application"
+2. Enter the following values and then click "Register application":
+    - Application name: `AutoBeatPack`
+    - Application Callback URLs: `http://localhost:7272`
+3. Make a file named `api_keys.txt` in the main AutoBeatPack folder and paste the values:
+    - Client ID on the first line
+    - Client Secret on the second line
+
+### Run script
+1. Activate virtual environment
+    - PowerShell: `.venv\Scripts\Activate.ps1`  
+    - Command Prompt: `.venv\Scripts\activate.bat`
+    - macOS / Linux: `source myvenv/bin/activate`
+2. Run script
+    - `python download.py`
 
 ## Config
-This script has a `DEFAULT` config profile provided, which will download every standard osu! Beatmap Pack from 1 to 1411, in batches of 3, to `./beatpacks`
-
-All of these values can be changed in `config.txt`.
+This script has several config profiles provided in `config.txt` for quick usage. All the values can be edited and new profiles can be created. A profile is used by entering its name when prompted by the script.
 
 ### Variables
 #### FirstPack
 - Number of the first pack to be downloaded
 - Use a whole number between 1 and `LastPack`
-- Default: 1
+- Default: `1`
 #### LastPack
 - Number of the last pack to be downloaded
 - Use a whole number greater than 1
-- Default: `1411`
+- Default: `9999`
 #### BatchSize
 - Maximum number of beatmaps to download at once
 - Too high a number will cause all connections to drop (anti-spam), 1 to 10 recommended
@@ -57,11 +71,17 @@ All of these values can be changed in `config.txt`.
 - Location to store downloaded beatmap packs
 - Relative to the main AutoBeatPack folder.
 - Default: `beatpacks`
+#### PackCategory
+- Beatmap pack type
+- Choose by name from [BeatmapPackType](https://osu.ppy.sh/docs/index.html#beatmappacktype)
+- Default: `standard`
+#### PackMode
+- Game mode: `osu!`, `osu!taiko`, `osu!catch`, `osu!mania`, `loved`
+- Applies when PackCategory is set to `standard`. Mode `loved` contains old Loved packs before the start of Project Loved.
+- Default: `osu!`
 
 ### Creating a new profile
-You may want to have more than one profile for organisational or testing purposes.
-
-1. Add a section to config.txt starting with the name of the profile in square brackets:
+1. Add a section to `config.txt` starting with the name of the profile in square brackets:
    ```
    [CoolProfileName]
    ```
@@ -70,7 +90,7 @@ You may want to have more than one profile for organisational or testing purpose
    [CoolProfileName]
    StartPack = 750
    BatchSize = 6
-   # This profile starts downloading at the 750th beatmap pack
+   # This profile downloads the 750th and onward standard osu! beatmap pack
    # And does it groups of 6
    ```
 3. Save your changes before running `download.py`. Enter your profile name when prompted, without square brackets.
