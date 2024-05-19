@@ -21,17 +21,17 @@ Automatic parallel download of osu! beatmap packs from the official source. No m
 All commands are run in the main AutoBeatPack folder.
 
 ### Requirements
-- Python >=3.4 (3.11-3.12 tested)
+- Python >=3.9 (3.11-3.12 tested)
 
 ### Script setup
 1. Create virtual environment
-    - `python -m venv .venv`
+    - `py -3.12 -m venv .venv` (change `3.12` to your Python version)
 2. Activate virtual environment
     - PowerShell: `.venv\Scripts\Activate.ps1`  
     - Command Prompt: `.venv\Scripts\activate.bat`
     - macOS / Linux: `source myvenv/bin/activate`
 3. Install requirements
-    - `python -m pip install -r requirements.txt`
+    - `py -m pip install -r requirements.txt`
 
 ### OAuth setup
 The API key is used to get the latest list of beatmap packs from the osu! website every time the script is run.
@@ -49,7 +49,7 @@ The API key is used to get the latest list of beatmap packs from the osu! websit
     - Command Prompt: `.venv\Scripts\activate.bat`
     - macOS / Linux: `source myvenv/bin/activate`
 2. Run script
-    - `python download.py`
+    - `py download.py`
 
 ## Config
 This script has several config profiles provided in `config.txt` for quick usage. All the values can be edited and new profiles can be created. A profile is used by entering its name when prompted by the script.
