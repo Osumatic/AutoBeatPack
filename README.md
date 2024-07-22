@@ -34,7 +34,7 @@ All commands are run in the main AutoBeatPack folder.
     - `py -m pip install -r requirements.txt`
 
 ### OAuth setup
-The API key is used to get the latest list of beatmap packs from the osu! website every time the script is run.
+The API key is used to get the latest list of beatmap packs from the osu! website every time the script is run. **Do NOT upload your API key to GitHub or anywhere else!** Keep it on your own computer only.
 1. Go to [osu! account settings](https://osu.ppy.sh/home/account/edit#oauth) and click "New OAuth Application"
 2. Enter the following values and then click "Register application":
     - Application name: `AutoBeatPack`
