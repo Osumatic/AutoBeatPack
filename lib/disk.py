@@ -14,9 +14,11 @@ class OpenModes(Enum):
     WRITE_BYTE = "xb"
     OVERWRITE_BYTE = "wb"
     APPEND_BYTE = "ab"
+    READ_BYTE = "rb"
     WRITE = "x"
     OVERWRITE = "w"
     APPEND = "a"
+    READ = "r"
 
 
 def make_folders(abs_url_folder: str, abs_download_folder: str):

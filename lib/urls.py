@@ -28,23 +28,28 @@ def make_all_urls(packs_range: range, pack_category: str, pack_mode: str):
     client_id, client_secret = get_osu_id()
 
     api = Ossapi(client_id, client_secret)
-    beatmappacks = api.beatmap_packs(type=pack_category)
-
     urls = []
-    for pack in beatmappacks.beatmap_packs:
-        wanted_info = PACK_TYPES[pack_category]
-        if pack_mode:
-            wanted_prefix = wanted_info["prefix"] + wanted_info["subtypes"][pack_mode]["prefix"]
-        else:
-            wanted_prefix = wanted_info["prefix"]
 
-        pack_prefix = "".join([char for char in pack.tag if char.isalpha()])
-        pack_num = pack.tag.removeprefix(pack_prefix)
+    # Generate from API
+    cursor = ""
+    while cursor is not None:
+        beatmappacks = api.beatmap_packs(type=pack_category, cursor_string=cursor)
+        cursor = beatmappacks.cursor_string
 
-        if pack_prefix != wanted_prefix:
-            continue
+        for pack in beatmappacks.beatmap_packs:
+            wanted_info = PACK_TYPES[pack_category]
+            if pack_mode:
+                wanted_prefix = wanted_info["prefix"] + wanted_info["subtypes"][pack_mode]["prefix"]
+            else:
+                wanted_prefix = wanted_info["prefix"]
 
-        if int(pack_num) in packs_range:
-            urls.append(pack.url)
+            pack_prefix = "".join([char for char in pack.tag if char.isalpha()])
+            pack_num = pack.tag.removeprefix(pack_prefix)
+
+            if pack_prefix != wanted_prefix:
+                continue
+
+            if int(pack_num) in packs_range:
+                urls.append(pack.url)
 
     return urls
